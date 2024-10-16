@@ -1,0 +1,8 @@
+production:
+  type: git
+  remote: https://github.com/alfsch/puppet-inventory.git
+  ref: production
+development:
+  type: git
+  remote: https://github.com/alfsch/puppet-inventory.git
+  ref: main

@@ -1,0 +1,100 @@
+---
+services:
+  puppet:
+    image: ghcr.io/voxpupuli/puppetserver:8.6.3-latest
+    hostname: puppet
+    environment:
+      PUPPETSERVER_ENVIRONMENT_TIMEOUT: 0
+      PUPPETSERVER_HOSTNAME: puppet
+      PUPPETSERVER_PORT: 8140
+      PUPPETDB_HOSTNAME: puppetdb
+      PUPPETDB_SSL_PORT: 8081
+      USE_PUPPETDB: true
+      AUTOSIGN: true
+      CSR_ATTRIBUTES: '{"custom_attributes": { "challengePassword": "foobar" }, "extension_requests": { "pp_project": "foo" } }'
+      # For private repos, use git@github.com:user/repo.git and provide SSH keys
+      R10K_REMOTE: https://gitea.cloud01.intern.steadforce.com/Infrastructure/Puppet.git
+    volumes:
+      - puppetserver:/opt/puppetlabs/server/data/puppetserver
+      - puppetserver-ssl:/etc/puppetlabs/puppet/ssl
+      - puppetserver-ca:/etc/puppetlabs/puppetserver/ca
+      - puppet-code:/etc/puppetlabs/code
+      - ./config/r10k:/etc/puppetlabs/r10k
+    restart: always
+    ports:
+      - 8140:8140
+    profiles:
+      - puppet
+
+  puppetdb:
+    image: ghcr.io/voxpupuli/puppetdb:8.6.0-latest
+    hostname: puppetdb
+    environment:
+      - USE_PUPPETSERVER=true
+      - PUPPETSERVER_HOSTNAME=puppet
+      - PUPPETSERVER_PORT=8140
+      - PUPPETDB_SSL_PORT=8081
+      - PUPPETDB_POSTGRES_HOSTNAME=postgres
+      - PUPPETDB_POSTGRES_PORT=5432
+      - PUPPETDB_PASSWORD=${POSTGRES_PASSWORD:-puppetdb}
+      - PUPPETDB_USER=${POSTGRES_USER:-puppetdb}
+    volumes:
+      - puppetdb:/opt/puppetlabs/server/data/puppetdb
+    restart: always
+    ports:
+      - 8081:8081
+    profiles:
+      - puppet
+
+  postgres:
+    image: docker.io/postgres:16-alpine
+    hostname: postgres
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-puppetdb}
+      - POSTGRES_USER=${POSTGRES_USER:-puppetdb}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-puppetdb}
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB'"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+    volumes:
+      - puppetdb-postgres:/var/lib/postgresql/data
+      - ./postgresql_init:/docker-entrypoint-initdb.d
+    restart: always
+    profiles:
+      - puppet
+
+  puppetboard:
+    image: ghcr.io/voxpupuli/puppetboard:latest
+    hostname: puppetboard
+    environment:
+      - PUPPETDB_HOST=puppetdb
+      # - PUPPETDB_PORT=8081 # use this for TLS
+      - PUPPETDB_PORT=8080  # Use this for non-TLS
+      - PUPPETBOARD_PORT=8088
+      - SECRET_KEY=628c4e02daaaca2b90242491f607d3704153d424f215ac51b1dd873055e102a5  # Long random String : python3 -c 'import secrets; print(secrets.token_hex())'
+      # if you wanna use SSL, you need to provide the following variables
+      # see the README.md for more information, look for "Generate additional certificates"
+    #   - PUPPETDB_SSL_VERIFY=/etc/puppetlabs/puppet/ssl/certs/ca.pem
+    #   - PUPPETDB_KEY=/etc/puppetlabs/puppet/ssl/private_keys/puppetboard.pem
+    #   - PUPPETDB_CERT=/etc/puppetlabs/puppet/ssl/certs/puppetboard.pem
+    # volumes:
+    #   - puppetserver-ssl:/etc/puppetlabs/puppet/ssl
+    restart: always
+    ports:
+      - 8088:8088
+    profiles:
+      - puppet
+
+networks:
+  default:
+    name: puppet-server
+
+volumes:
+  puppetserver:
+  puppetserver-ssl:
+  puppetserver-ca:
+  puppet-code:
+  puppetdb:
+  puppetdb-postgres:
