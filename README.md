@@ -16,7 +16,7 @@ To start up the local puppet infrastructure you need:
   `uvt-kvm` is found in the path)
 
 ## manage puppet infrastructure
-Open the shell of your choice and change to the folder `local-testing inside
+Open the shell of your choice and change to the folder `local-testing` inside
 of this repository.
 
 ### fire up local puppet infrastructure
@@ -120,3 +120,50 @@ to `/etc/puppetlabs/puppet/puppet.conf` and `reboot` the machine.
 ```shell
  uvt-kvm destroy puppet-test
 ```
+
+### create local debian vm with cloud-init and virt-install
+run the followin commands in folder `local-testing/virt-install` inside
+of this repository.
+
+```shell
+
+ touch network-config
+ cat >meta-data <<EOF
+instance-id: debian12
+local-hostname: debian12
+EOF
+ cat >cloud-init.yaml <<EOF
+#cloud-config
+
+users:
+  - name: alfred
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPqNH7jh3avVtrm24qe61Cf8IGmtLcpLMHK2IlhDpawG alfred@sol
+    sudo: ["ALL=(ALL) NOPASSWD:ALL"]
+    groups: sudo
+    shell: /bin/bash
+EOF
+
+ # with genericcloud image the cloud-config script mounting doesn't work with virt-install
+ 
+ wget https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-generic-amd64.qcow2
+
+ virt-install --name debian12 \
+              --memory 2048 \
+              --vcpus 2 \
+              --disk=size=30,backing_store="$(pwd)/debian-12-generic-amd64.qcow2" \
+              --cloud-init user-data=./cloud-init.yaml,meta-data=./meta-data,disable=on \
+              --network bridge=virbr0 \
+              --osinfo=debian12
+```
+
+### get ip for local debian vm created with virt-install
+```shell
+ virsh net-dhcp-leases default
+ ```
+
+### destroy local debian vm created with virt-install
+```shell
+ virsh destroy --domain debian12
+ virsh undefine --domain debian12 --remove-all-storage
+ ```

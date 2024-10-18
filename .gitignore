@@ -1,2 +1,6 @@
 /.project
 /.settings/
+/local-testing/virt-install/cloud-init.yaml
+/local-testing/virt-install/meta-data
+/local-testing/virt-install/network-config
+/local-testing/virt-install/*.qcow2
