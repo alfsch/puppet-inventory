@@ -1,0 +1,11 @@
+version: 5
+hierarchy:
+- name: installed packages
+  paths:
+  - installed_packages.yaml
+- name: purged packages
+  paths:
+  - purged_packages.yaml
+- name: common data configuration
+  paths:
+  - common.yaml

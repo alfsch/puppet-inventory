@@ -1,32 +1,15 @@
-class profile::base::packages {
-  package { [
-            'avahi-utils',
-            'byobu',
-            'bzip2',
-            'ca-certificates',
-            'cifs-utils',
-            'curl',
-            'fdisk',
-            'gdisk',
-            'gnupg-agent',
-            'iptraf-ng',
-            'jq',
-            'keyutils',
-            'locate',
-            'members',
-            'net-tools',
-            'nfs-common',
-            'openssl',
-            'pwgen',
-            'seccomp',
-            'smbclient',
-            'sudo',
-            'tcpdump',
-            'unzip',
-            'vim',
-            'wget',
-            ]:
+class profile::base::packages (
+  Array[String] $ensured_package_list,
+  Array[String] $purged_package_list,
+) {
+  # install the packages that are required by the base profile
+  package { $ensured_package_list:
     ensure => latest,
+  }
+
+  # purge the packages that are not required by the base profile
+  package { $purged_package_list:
+    ensure => purged,
   }
 
   if ($virtual == "kvm") {
