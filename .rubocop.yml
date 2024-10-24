@@ -1,0 +1,4 @@
+# force the target ruby version to 2.8.x
+# because puppet 7.x is compatible with ruby 2.8.x
+AllCops:
+  TargetRubyVersion: 2.8.x
