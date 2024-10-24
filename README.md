@@ -82,8 +82,8 @@ to a ubuntu release you want to test.
 ```
 
 ### connect vm to puppet
-As first step you have to determine the ip address from your ethernet connection. Then
-you have to ssh into the vm.
+As first step you have to determine  the ip address (e.g. `hostname -I`) from your ethernet connection.
+Then you have to ssh into the vm.
 
 Inside the vm you have to configure the hosts that it knows the ip of your local puppet
 listening on your hosts interface.
@@ -98,8 +98,8 @@ puppet agent from puppet repos by ourself.
 
 ```shell
  sudo -i
- wget https://apt.puppetlabs.com/puppet7-release-noble.deb
- dpkg -i puppet7-release-noble.deb
+ wget https://apt.puppetlabs.com/puppet7-release-$(lsb_release -sc).deb
+ dpkg -i puppet7-release-$(lsb_release -sc).deb
  apt update
  apt install --no-install-recommends -y ca-certificates lsb-release puppet-agent vim
 ```
