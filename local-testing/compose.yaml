@@ -4,7 +4,6 @@ services:
     image: ghcr.io/voxpupuli/puppetserver:8.7.0-latest
     hostname: puppet
     environment:
-      PUPPETSERVER_ENVIRONMENT_TIMEOUT: 0
       PUPPETSERVER_HOSTNAME: puppet
       PUPPETSERVER_PORT: 8140
       PUPPETDB_HOSTNAME: puppetdb
