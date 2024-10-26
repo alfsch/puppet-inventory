@@ -35,16 +35,10 @@ of this repository.
 ```
 
 ### configure puppet-server to use this repository as environment
-At first start a shell inside the puppetserver container.
+Execute the update-inventory.sh script inside the puppetserver container with
 
 ```shell
- docker compose --profile puppet exec -it puppet bash
-```
-
-Inside the container you have to execute
-
-```shell
- r10k deploy environment -m -v
+ docker compose --profile puppet exec puppet bash -c /etc/puppetlabs/scripts/update-inventory.sh
 ```
 
 to initialize the puppet environment after the first bootstrapping

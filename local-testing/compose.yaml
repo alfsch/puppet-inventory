@@ -20,6 +20,7 @@ services:
       - puppetserver-ca:/etc/puppetlabs/puppetserver/ca
       - puppet-code:/etc/puppetlabs/code
       - ./config/r10k:/etc/puppetlabs/r10k
+      - ./scripts:/etc/puppetlabs/scripts
     restart: always
     ports:
       - 8140:8140
