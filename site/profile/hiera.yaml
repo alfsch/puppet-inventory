@@ -6,6 +6,9 @@ hierarchy:
 - name: purged packages
   paths:
   - purged_packages.yaml
+- name: unattended upgrades
+  paths:
+  - unattended_upgrades.yaml
 - name: common data configuration
   paths:
   - common.yaml

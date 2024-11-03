@@ -1,0 +1,11 @@
+profile::base::unattended_upgrades::blacklist: [
+]
+profile::base::unattended_upgrades::extra_origins: [
+      'origin=${distro_id},suite=${distro_codename}-updates',
+      'origin=Docker,suite=${distro_codename}',
+]
+profile::base::unattended_upgrades::max: 0
+profile::base::unattended_upgrades::min: 2
+profile::base::unattended_upgrades::reboot: true
+profile::base::unattended_upgrades::reboot_withusers: false
+profile::base::unattended_upgrades::reboot_time: '23:07'
