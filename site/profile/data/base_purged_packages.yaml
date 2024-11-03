@@ -1,0 +1,5 @@
+lookup_options:
+  profile::base::packages::purged_package_list:
+    merge: unique
+profile::base::packages::purged_package_list: [
+]

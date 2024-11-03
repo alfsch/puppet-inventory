@@ -2,13 +2,13 @@ version: 5
 hierarchy:
 - name: installed packages
   paths:
-  - installed_packages.yaml
+  - base_installed_packages.yaml
 - name: purged packages
   paths:
-  - purged_packages.yaml
+  - base_purged_packages.yaml
 - name: unattended upgrades
   paths:
-  - unattended_upgrades.yaml
+  - base_unattended_upgrades.yaml
 - name: common data configuration
   paths:
   - common.yaml

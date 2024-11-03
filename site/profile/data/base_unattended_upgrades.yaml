@@ -1,3 +1,8 @@
+lookup_options:
+  profile::base::unattended_upgrades::blacklist:
+    merge: unique
+  profile::base::unattended_upgrades::extra_origins:
+    merge: unique
 profile::base::unattended_upgrades::blacklist: [
 ]
 profile::base::unattended_upgrades::extra_origins: [

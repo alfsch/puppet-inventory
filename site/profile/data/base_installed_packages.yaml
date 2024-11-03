@@ -1,3 +1,6 @@
+lookup_options:
+  profile::base::packages::ensured_package_list:
+    merge: unique
 profile::base::packages::ensured_package_list: [
   auto-apt-proxy,
   avahi-utils,
