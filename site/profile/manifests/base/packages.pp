@@ -7,8 +7,10 @@ class profile::base::packages (
     ensure => latest,
   }
 
+  # only purge packages that are not required by the ensured_package_list
+  $purge_packages = difference($purged_package_list, $ensured_package_list)
   # purge the packages that are not required by the base profile
-  package { $purged_package_list:
+  package { $purge_packages:
     ensure => purged,
   }
 
