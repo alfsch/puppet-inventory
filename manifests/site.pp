@@ -3,3 +3,7 @@
 node default {
   include role::desktop
 }
+
+node 'apt-proxy' {
+  include role::headless
+}
