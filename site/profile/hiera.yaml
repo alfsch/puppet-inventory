@@ -1,9 +1,15 @@
 version: 5
 hierarchy:
-- name: installed packages
+- name: desktop installed packages
+  paths:
+  - desktop_installed_packages.yaml
+- name: desktop purged packages
+  paths:
+  - desktop_purged_packages.yaml
+- name: base installed packages
   paths:
   - base_installed_packages.yaml
-- name: purged packages
+- name: base purged packages
   paths:
   - base_purged_packages.yaml
 - name: unattended upgrades
