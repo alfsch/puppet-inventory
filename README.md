@@ -52,6 +52,14 @@ and replace localhost wtih the ip in the browser. The puppet dashboard has
 also to be reached via this ip address. Write down this ip, you'll need it
 later on testing with local vm.
 
+### certificate cleanup after recreation of vm
+sometimes after recreation of the vm, puppet complains about invalid certificates.
+Then it's mandatory to cleanup the server side certificates in puppet server.
+
+```shell
+  docker compose --profile puppet exec puppet bash -c "puppetserver ca clean --certname <hostname of vm>"
+```
+
 ## connect local vm to local puppet infrastructure
 The following is for linux users, windows user have to discover a way to
 launch a vm with a minimal ubuntu, of the desired version.
@@ -149,6 +157,7 @@ EOF
               --cloud-init user-data=./cloud-init.yaml,meta-data=./meta-data,disable=on \
               --network bridge=virbr0 \
               --osinfo=debian12
+              --video=virtio
 ```
 
 ### get ip for local debian vm created with virt-install
@@ -156,8 +165,54 @@ EOF
  virsh net-dhcp-leases default
  ```
 
+### ssh into local debian vm created with virt-install
+```shell
+ ssh root@<determined ip>
+```
+
 ### destroy local debian vm created with virt-install
 ```shell
  virsh destroy --domain debian12
  virsh undefine --domain debian12 --remove-all-storage
- ```
+```
+
+## connect local VM to local puppet
+As first step you have to determine the IP address of your host system.
+Then you have to SSH into the VM.
+
+Inside the VM you have to configure `/etc/hosts` in a way that it knows the IP of your local
+puppet server, started with docker compose, listening on your hosts interface.
+
+Determin the real IP of your network interface with e.g. `hostname -I` (most times it's the
+first one printed out like `192.168.1.xxx`).
+
+```shell
+ sudo -i
+ echo "<your determined ip> puppet" >> /etc/hosts
+```
+
+Since puppet agent isn't provided in a good working condition from distribution sources,
+we have to install the puppet agent from puppet repos ourselves.
+
+```shell
+ sudo -i
+ wget https://apt.puppetlabs.com/puppet7-release-$(lsb_release -sc).deb
+ dpkg -i puppet7-release-$(lsb_release -sc).deb
+ apt update
+ apt install --no-install-recommends -y ca-certificates lsb-release puppet-agent vim
+```
+
+append
+
+```
+ cat >>/etc/puppetlabs/puppet/puppet.conf <<EOF
+certname = <your node name e. g. debian12>
+environment = <your development branch>
+[agent]
+number_of_facts_soft_limit = 5120
+runtimeout = 2h
+EOF
+```
+
+and relogin to the VM, to get puppet into the execution path.
+
