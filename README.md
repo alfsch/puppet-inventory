@@ -60,7 +60,7 @@ Then it's mandatory to cleanup the server side certificates in puppet server.
   docker compose --profile puppet exec puppet bash -c "puppetserver ca clean --certname <hostname of vm>"
 ```
 
-## connect local vm to local puppet infrastructure
+## start ubuntu vm for local testing
 The following is for linux users, windows user have to discover a way to
 launch a vm with a minimal ubuntu, of the desired version.
 
@@ -83,45 +83,13 @@ to a ubuntu release you want to test.
  uvt-kvm ssh puppet-test
 ```
 
-### connect vm to puppet
-As first step you have to determine  the ip address (e.g. `hostname -I`) from your ethernet connection.
-Then you have to ssh into the vm.
-
-Inside the vm you have to configure the hosts that it knows the ip of your local puppet
-listening on your hosts interface.
-
-```shell
- sudo -i
- echo "<your determined ip> puppet" >> /etc/hosts
-```
-
-Since puppet agent isn't provided in a good working way by ubuntu, we have to install the
-puppet agent from puppet repos by ourself.
-
-```shell
- sudo -i
- wget https://apt.puppetlabs.com/puppet7-release-$(lsb_release -sc).deb
- dpkg -i puppet7-release-$(lsb_release -sc).deb
- apt update
- apt install --no-install-recommends -y ca-certificates lsb-release puppet-agent vim
-```
-
-append
-
-```
-environment = <your development branch>
-[agent]
-number_of_facts_soft_limit = 5120
-runtimeout = 2h
-```
-
-to `/etc/puppetlabs/puppet/puppet.conf` and `reboot` the machine.
-
 ### clean up local vm
 
 ```shell
  uvt-kvm destroy puppet-test
 ```
+
+## start debian vm for local testing
 
 ### create local debian vm with cloud-init and virt-install
 run the followin commands in folder `local-testing/virt-install` inside
@@ -134,29 +102,19 @@ of this repository.
 instance-id: debian12
 local-hostname: debian12
 EOF
- cat >cloud-init.yaml <<EOF
-#cloud-config
-
-users:
-  - name: alfred
-    ssh_authorized_keys:
-      - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPqNH7jh3avVtrm24qe61Cf8IGmtLcpLMHK2IlhDpawG alfred@sol
-    sudo: ["ALL=(ALL) NOPASSWD:ALL"]
-    groups: sudo
-    shell: /bin/bash
-EOF
 
  # with genericcloud image the cloud-config script mounting doesn't work with virt-install
  
  wget https://cloud.debian.org/images/cloud/bookworm/latest/debian-12-generic-amd64.qcow2
 
  virt-install --name debian12 \
-              --memory 2048 \
+              --memory 4096 \
               --vcpus 2 \
               --disk=size=30,backing_store="$(pwd)/debian-12-generic-amd64.qcow2" \
-              --cloud-init user-data=./cloud-init.yaml,meta-data=./meta-data,disable=on \
-              --network bridge=virbr0 \
-              --osinfo=debian12
+              --cloud-init meta-data=./meta-data,root-ssh-key=$HOME/.ssh/id_ed25519.pub,disable=on \
+              --network network=default \
+              --noautoconsole \
+              --osinfo=debian12 \
               --video=virtio
 ```
 
@@ -206,7 +164,6 @@ append
 
 ```
  cat >>/etc/puppetlabs/puppet/puppet.conf <<EOF
-certname = <your node name e. g. debian12>
 environment = <your development branch>
 [agent]
 number_of_facts_soft_limit = 5120
