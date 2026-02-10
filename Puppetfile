@@ -1,5 +1,5 @@
 mod 'puppetlabs/stdlib',              '9.7.0'
-mod 'puppetlabs/docker',              '10.3.0'
+mod 'puppetlabs/docker',              '10.4.0'
 mod 'puppetlabs/apt',                 '9.4.0'
 mod 'puppetlabs-puppetdb',            '8.1.0'
 mod 'puppetlabs/inifile',             '6.3.0'
