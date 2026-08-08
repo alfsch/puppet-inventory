@@ -1,6 +1,6 @@
 mod 'puppetlabs/stdlib',              '9.7.0'
 mod 'puppetlabs/docker',              '10.4.1'
-mod 'puppetlabs/apt',                 '9.4.0'
+mod 'puppetlabs/apt',                 '11.3.2'
 mod 'puppetlabs-puppetdb',            '8.1.0'
 mod 'puppetlabs/inifile',             '6.4.1'
 mod 'puppetlabs/concat',              '9.1.0'
