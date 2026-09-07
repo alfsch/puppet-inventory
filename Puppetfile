@@ -1,4 +1,4 @@
-mod 'puppetlabs/stdlib',              '9.7.0'
+mod 'puppetlabs/stdlib',              '10.1.0'
 mod 'puppetlabs/docker',              '10.4.1'
 mod 'puppetlabs/apt',                 '9.4.0'
 mod 'puppetlabs-puppetdb',            '8.1.0'
